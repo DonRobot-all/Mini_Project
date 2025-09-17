@@ -65,6 +65,7 @@
 
 import os
 import time
+import random
 from collections import deque
 
 # Лабиринт: # - стена, . - дорога, @ - игрок, B - бот
@@ -80,8 +81,39 @@ player_x, player_y = 1, 1   # человек
 bot_x, bot_y = 8, 3         # бот начинает справа внизу
 
 
+def generate_maze(width, height):
+    # размеры должны быть нечетными, чтобы были стены
+    if width % 2 == 0: width += 1
+    if height % 2 == 0: height += 1
+
+    maze = [["#" for _ in range(width)] for _ in range(height)]
+
+    # начинаем с точки (1,1)
+    start_x, start_y = 1, 1
+    maze[start_y][start_x] = "."
+
+    stack = [(start_x, start_y)]
+    directions = [(0,2),(2,0),(0,-2),(-2,0)]
+
+    while stack:
+        x, y = stack[-1]
+        random.shuffle(directions)
+        carved = False
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if 1 <= nx < width-1 and 1 <= ny < height-1 and maze[ny][nx] == "#":
+                maze[ny][nx] = "."
+                maze[y + dy//2][x + dx//2] = "."
+                stack.append((nx, ny))
+                carved = True
+                break
+        if not carved:
+            stack.pop()
+
+    return maze
+
 def print_maze():
-    os.system("cls" if os.name == "nt" else "clear")
+    # os.system("cls" if os.name == "nt" else "clear")
     for row in maze:
         print("".join(row))
 
@@ -111,12 +143,14 @@ def find_path(start, goal):
                 queue.append((nx, ny))
 
     # восстанавливаем путь
+    print(visited)
     path = []
     cur = goal
     while cur and cur in visited:
         path.append(cur)
         cur = visited[cur]
     path.reverse()
+    print(path)
     return path
 
 
@@ -135,6 +169,8 @@ def move_bot():
 
 
 # ---------- Игра ----------
+maze = generate_maze(21, 15) 
+
 maze[player_y][player_x] = "@"
 maze[bot_y][bot_x] = "B"
 
