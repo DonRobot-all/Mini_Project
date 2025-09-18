@@ -143,7 +143,7 @@ def find_path(start, goal):
                 queue.append((nx, ny))
 
     # восстанавливаем путь
-    print(visited)
+    # print(visited)
     path = []
     cur = goal
     while cur and cur in visited:
