@@ -190,3 +190,64 @@ while True:
 
     move_bot()
     time.sleep(0.2)
+
+
+
+
+# ---------- Поиск пути для бота ----------
+def find_path(start, goal):
+    queue = deque([start])
+    visited = {start: None}
+
+    while queue:
+        x, y = queue.popleft()
+        if (x, y) == goal:
+            break
+        for dx, dy in [(0,1),(1,0),(0,-1),(-1,0)]:
+            nx, ny = x+dx, y+dy
+            if maze[ny][nx] in [".","@"] and (nx, ny) not in visited:
+                visited[(nx, ny)] = (x, y)
+                queue.append((nx, ny))
+
+    path = []
+    cur = goal
+    while cur and cur in visited:
+        path.append(cur)
+        cur = visited[cur]
+    path.reverse()
+    return path
+
+
+# ---------- Бот-охотник ----------
+def move_bot():
+    global bot_x, bot_y
+    # Проверяем: видит ли бот игрока в радиусе 2 клеток
+    if abs(player_x - bot_x) <= 2 and abs(player_y - bot_y) <= 2:
+        path = find_path((bot_x, bot_y), (player_x, player_y))
+        if len(path) > 1:
+            new_x, new_y = path[1]
+        else:
+            new_x, new_y = bot_x, bot_y
+    else:
+        # случайный ход, если игрока не видно
+        moves = [(0,1),(0,-1),(1,0),(-1,0)]
+        random.shuffle(moves)
+        new_x, new_y = bot_x, bot_y
+        for dx, dy in moves:
+            nx, ny = bot_x+dx, bot_y+dy
+            if maze[ny][nx] == ".":
+                new_x, new_y = nx, ny
+                break
+
+    # Проверка на поимку
+    if (new_x, new_y) == (player_x, player_y):
+        maze[bot_y][bot_x] = "."
+        bot_x, bot_y = new_x, new_y
+        maze[bot_y][bot_x] = "B"
+        print_maze()
+        print("Бот поймал игрока!")
+        exit()
+
+    maze[bot_y][bot_x] = "."
+    bot_x, bot_y = new_x, new_y
+    maze[bot_y][bot_x] = "B"
