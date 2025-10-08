@@ -39,7 +39,6 @@ def generate_maze(width, height, delay=0.05):
         if not carved:
             stack.pop()
 
-        # визуализация
         clear()
         print_maze(maze)
         time.sleep(delay)
@@ -48,3 +47,20 @@ def generate_maze(width, height, delay=0.05):
 
 if __name__ == "__main__":
     generate_maze(31, 21, delay=0.02)
+
+
+
+
+# Функция проверяет, подходит ли заданное a
+def f(a):
+    for x in range(1000):
+        # ((x & 36 != 0) ∨ (x & 27 == 0)) ∨ (x & a != 0)
+        if not (((x & 36 != 0) or (x & 27 == 0)) or (x & a != 0)):
+            return False
+    return True
+
+# Ищем минимальное a, при котором условие истинно для всех x
+for A in range(1000):
+    if f(A):
+        print(A)  # выводим ответ и выходим
+        break
