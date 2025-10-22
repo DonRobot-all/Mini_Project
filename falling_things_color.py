@@ -10,9 +10,13 @@ WIDTH = 20
 HEIGHT = 15
 FRAME_DELAY = 0.1
 EXP_GROWTH = 1.08
-TRAP_CHANCE = 0.2         # вероятность появления ловушки
-FREEZE_DURATION = 2        # сколько ходов игрок стоит на месте
-TRAP_BLINK_TIME = 3        # сколько кадров ловушка мигает перед падением
+TRAP_CHANCE = 0.2          # вероятность появления ловушки
+FREEZE_DURATION = 2         # сколько ходов игрок стоит на месте
+TRAP_BLINK_TIME = 4         # сколько кадров ловушка мигает перед падением
+
+# ANSI цвета (работает в большинстве терминалов)
+RED = "\033[91m"
+RESET = "\033[0m"
 
 # -------------------------------
 # Игровые объекты
@@ -38,12 +42,12 @@ def draw():
     for o in objects:
         if 0 <= int(o["y"]) < HEIGHT:
             if o["is_trap"]:
-                # Если ловушка ещё мигает — иногда показываем
+                # Если ловушка мигает — показываем красный восклицательный знак
                 if o.get("blink_timer", 0) > 0:
-                    if o["blink_timer"] % 2 == 0:  # мигает через кадр
-                        canvas[int(o["y"])][o["x"]] = "!"
+                    if o["blink_timer"] % 2 == 0:
+                        canvas[int(o["y"])][o["x"]] = f"{RED}!{RESET}"
                 else:
-                    # уже падает — не видна
+                    # уже падает — невидима
                     pass
             else:
                 canvas[int(o["y"])][o["x"]] = "*"
@@ -59,7 +63,7 @@ def draw():
         print("".join(row))
     print(f"Score: {score} | Level: {level:.1f} | Speed: {base_speed:.2f}")
     if frozen_steps > 0:
-        print(f"Игрок заморожен на {frozen_steps} ход(а)")
+        print(f"⛔ Игрок заморожен на {frozen_steps} ход(а)")
     print("← a | → d | q - выход")
 
 def intersects(a, b):
